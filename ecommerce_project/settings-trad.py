@@ -28,34 +28,38 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Application definition
-INSTALLED_APPS = [
-    'core',
+BASE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
 
+THIRD_APPS = [
     # Configuración de Crispy Forms
     'crispy_forms',
     'crispy_bootstrap5',
+
     # Configuración de Django-allauth
     'django.contrib.sites',
-    'allauth.account',
     'allauth',
+    'allauth.account',
     'allauth.socialaccount',
+
     # Desinstalar django-extensions en producción (Facebook)
     'django_extensions',
-
-
 ]
 
-#INSTALLED_APPS =  BASE_APPS + THIRD_APPS + OWN_APPS
+OWN_APPS = [
+    'core',
+]
+
+INSTALLED_APPS = BASE_APPS + THIRD_APPS + OWN_APPS
 
 
 
-# Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -63,7 +67,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 SITE_ID = 1
 
 MIDDLEWARE = [
-    "django.middleware.locale.LocaleMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,7 +81,9 @@ ROOT_URLCONF = "ecommerce_project.urls"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+                 os.path.join(BASE_DIR, 'templates', 'core', 'account'),
+                 os.path.join(BASE_DIR, 'templates', 'core', 'allauth'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,12 +91,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',
             ],
         },
     },
 ]
-
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -132,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = 'es-cl'
-TIME_ZONE = 'America/Santiago'       # Universal Cordinated Time
+TIME_ZONE = 'America/Chile/Santiago'       # Universal Cordinated Time
 USE_I18N = True
 USE_TZ = True
 
@@ -147,5 +150,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-LOGIN_REDIRECT_URL = '/'
