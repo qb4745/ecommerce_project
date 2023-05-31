@@ -1,8 +1,12 @@
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.views.generic import View
 from .models import Item, OrderItem, Order
 
 # Create your views here.
@@ -14,11 +18,26 @@ class HomeListView(ListView):
     template_name = "core/home.html"
 
 
+class OrderSummaryView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            context = {
+                "object": order
+            }
+            return render(self.request, "core/order_summary.html", context)
+
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "No tienes un pedido activo.")
+            return redirect("/")
+
+
 class ItemDetailView(DetailView):
     model = Item
     template_name = "core/product.html"
 
 
+@login_required
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_item, created = OrderItem.objects.get_or_create(
@@ -34,11 +53,11 @@ def add_to_cart(request, slug):
             order_item.quantity += 1
             order_item.save()
             messages.info(request, "Se ha añadido otra unidad a su carro.")
-            return redirect("core:core-product", slug=slug)
+            return redirect("core:core-order-summary")
         else:
-            messages.info(request, "Este producto fue agregado a su carro.")
             order.items.add(order_item)
-            return redirect("core:core-product", slug=slug)
+            messages.info(request, "Este producto fue agregado a su carro.")
+            return redirect("core:core-order-summary")
 
     else:
         ordered_date = timezone.now()
@@ -46,9 +65,41 @@ def add_to_cart(request, slug):
             user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
         messages.info(request, "Este producto fue agregado a su carro.")
-        return redirect("core:core-product", slug=slug)
+        return redirect("core:core-order-summary")
 
 
+@login_required
+def remove_single_item_from_cart(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    order_qs = Order.objects.filter(
+        user=request.user,
+        ordered=False
+    )
+    if order_qs.exists():
+        order = order_qs[0]
+        # check if the order item is in the order
+        if order.items.filter(item__slug=item.slug).exists():
+            order_item = OrderItem.objects.filter(
+                item=item,
+                user=request.user,
+                ordered=False
+            )[0]
+            if order_item.quantity > 1:
+                order_item.quantity -= 1
+                order_item.save()
+            else:
+                order.items.remove(order_item)
+            messages.info(request, "La cantidad del producto fue actualizada.")
+            return redirect("core:core-order-summary")
+        else:
+            messages.info(request, "Este producto no estaba en su carro.")
+            return redirect("core:core-order-summary", slug=slug)
+    else:
+        messages.info(request, "No tienes un pedido activo.")
+        return redirect("core:core-order-summary", slug=slug)  # Using .first() instead of [0] to handle cases where the item doesn't exist
+
+
+@login_required
 def remove_from_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_qs = Order.objects.filter(
@@ -63,18 +114,14 @@ def remove_from_cart(request, slug):
                 item=item,
                 user=request.user,
                 ordered=False
-            ).first()
-            if order_item.quantity > 1:
-                order_item.quantity -= 1
-                order_item.save()
-            else:
-                order.items.remove(order_item)
-                order_item.delete()
+            )[0]
+            order.items.remove(order_item)
+            order_item.delete()
             messages.info(request, "La cantidad del producto fue actualizada.")
-            return redirect("core:core-product", slug=slug)
+            return redirect("core:core-order-summary")
         else:
             messages.info(request, "Este producto no estaba en su carro.")
-            return redirect("core:core-product", slug=slug)
+            return redirect("core:core-order-summary")
     else:
         messages.info(request, "No tienes un pedido activo.")
-        return redirect("core:core-product", slug=slug)  # Using .first() instead of [0] to handle cases where the item doesn't exist
+        return redirect("core:core-order-summary")  # Using .first() instead of [0] to handle cases where the item doesn't exist

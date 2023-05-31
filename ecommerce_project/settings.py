@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+
 
     # Configuración de Crispy Forms
     'crispy_forms',
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # Desinstalar django-extensions en producción (Facebook)
     'django_extensions',
+    'pytz',
 
 
 ]
@@ -63,15 +66,16 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 SITE_ID = 1
 
 MIDDLEWARE = [
-    "django.middleware.locale.LocaleMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = "ecommerce_project.urls"
 
@@ -87,6 +91,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
+            ],
+            'builtins': [
+                'django.contrib.humanize.templatetags.humanize',
             ],
         },
     },
@@ -131,17 +138,27 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'es-cl'
-TIME_ZONE = 'America/Santiago'       # Universal Cordinated Time
+LANGUAGE_CODE = 'es-CL'
+TIME_ZONE = 'America/Santiago'      # Universal Cordinated Time
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
+
+LANGUAGES = [
+    ('es-CL', 'Spanish (Chile)'),
+    # Other language entries...
+]
+
+USE_THOUSAND_SEPARATOR = True
+
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -149,3 +166,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'
+
+LOCALE_PATHS = [
+    BASE_DIR / 'core' / 'locale',
+]
