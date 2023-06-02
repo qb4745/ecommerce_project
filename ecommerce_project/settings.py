@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # Desinstalar django-extensions en producción (Facebook)
     'django_extensions',
+    'django_countries',
     'pytz',
 
 

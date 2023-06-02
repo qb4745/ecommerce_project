@@ -7,7 +7,8 @@ from django.views.generic import ListView, DetailView
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic import View
-from .models import Item, OrderItem, Order
+from .forms import CheckoutForm
+from .models import Item, OrderItem, Order, BillingAddress
 
 # Create your views here.
 
@@ -16,6 +17,47 @@ class HomeListView(ListView):
     model = Item
     paginate_by = 5
     template_name = "core/home.html"
+
+
+class CheckoutView(View):
+    def get(self, *args, **kwargs):
+        form = CheckoutForm()
+        context = {
+            'form': form
+        }
+        return render(self.request, 'core/checkout.html', context)
+
+    def post(self, *args, **kwargs):
+        form = CheckoutForm(self.request.POST or None)
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            if form.is_valid():
+                street_adress = form.cleaned_data.get("street_adress")
+                apartment_adress = form.cleaned_data.get("apartment_adress")
+                country =form.cleaned_data.get("country")
+                zip = form.cleaned_data.get("zip")
+                # TODO: add functionality for these fields
+                # same_shipping_adress = form.cleaned_data.get("same_shipping_adress")
+                # save_info = form.cleaned_data.get("save_info")
+                payment_option = form.cleaned_data.get("payment_option")
+                billing_address = BillingAddress(
+                    user=self.request.user,
+                    street_adress=street_adress,
+                    apartment_adress=apartment_adress,
+                    country=country,
+                    zip=zip
+                )
+                billing_address.save()
+                order.billing_address = billing_address
+                order.save()
+                # TODO: redirect to the selected payment option
+                return redirect('core:core-checkout')
+            messages.warning(self.request, "Error al enviar el formulario.")
+            return redirect('core:core-checkout')
+
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "No tienes un pedido activo.")
+            return redirect("core:core-order-summary")
 
 
 class OrderSummaryView(LoginRequiredMixin, View):
@@ -121,7 +163,7 @@ def remove_from_cart(request, slug):
             return redirect("core:core-order-summary")
         else:
             messages.info(request, "Este producto no estaba en su carro.")
-            return redirect("core:core-order-summary")
+            return redirect("core:core-product", slug=slug)
     else:
         messages.info(request, "No tienes un pedido activo.")
         return redirect("core:core-order-summary")  # Using .first() instead of [0] to handle cases where the item doesn't exist
