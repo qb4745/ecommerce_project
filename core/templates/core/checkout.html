@@ -1,0 +1,179 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+  <!--Main layout-->
+  <main class="mt-5 pt-4">
+    <div class="container wow fadeIn">
+
+      <!-- Heading -->
+      <h2 class="my-5 h2 text-center">Revisar y Pagar</h2>
+
+      <!--Grid row-->
+      <div class="row">
+
+        <!--Grid column-->
+        <div class="col-md-8 mb-4">
+
+          <!--Card-->
+          <div class="card">
+
+
+            <!--Card content-->
+            <form method="POST" class="card-body">
+              {% csrf_token %}
+
+
+              <!--address-->
+              <div class="md-form mb-5">
+                {% comment %} <input type="text" id="address" class="form-control" placeholder="1234 Main St"> {% endcomment %}
+                {{ form.street_adress|as_crispy_field }}
+                <label for="address" class=""></label>
+              </div>
+
+              <!--address-2-->
+              <div class="md-form mb-5">
+                {% comment %} <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite"> {% endcomment %}
+                {{ form.apartment_adress|as_crispy_field }}
+                <label for="address-2" class=""></label>
+              </div>
+
+              <!--Grid row-->
+              <div class="row">
+
+                <!--Grid column-->
+                <div class="col-lg-4 col-md-12 mb-4">
+
+                  <label for="country">País</label>
+
+                  {{ form.country }}
+                  <div class="invalid-feedback">
+                    Por favor seleccione un País Válido.
+                  </div>
+
+                </div>
+                <!--Grid column-->
+
+
+                <!--Grid column-->
+                <div class="col-lg-4 col-md-6 mb-4">
+
+                  {% comment %} <input type="text" class="form-control" id="zip" placeholder="" required> {% endcomment %}
+                  {{ form.zip|as_crispy_field }}
+                  <div class="invalid-feedback">
+                    Zip code required.
+                  </div>
+
+                </div>
+                <!--Grid column-->
+
+              </div>
+              <!--Grid row-->
+
+              <hr>
+
+              <div class="custom-control custom-checkbox">
+                <input {% if form.same_shipping_adress.value %}checked{% endif %} type="checkbox" class="custom-control-input" name="same_billing_adress" id="same-address">
+                <label class="custom-control-label" for="same-address">La dirección de envío es la misma que mi dirección de facturación.</label>
+              </div>
+              <div class="custom-control custom-checkbox">
+                <input {% if form.save_info.value %}checked{% endif %} type="checkbox" class="custom-control-input" id="save-info">
+                <label class="custom-control-label" for="save-info">Guardar esta información para la próxima vez.</label>
+              </div>
+
+              <hr>
+
+              <div class="d-block my-3">
+                {% for valor, nombre  in form.fields.payment_option.choices %}
+                  <div class="custom-control custom-radio">
+                    <input id="{{ nombre }}" name="payment_option" value="{{ valor }}" type="radio" class="custom-control-input" required>
+                    <label class="custom-control-label" for="{{ nombre }}">{{ nombre }}</label>
+                    {% comment %} {{ form.payment_option }} {% endcomment %}
+                  </div>
+                {% endfor %}
+                {% comment %} <div class="custom-control custom-radio">
+                  <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required>
+                  <label class="custom-control-label" for="paypal">Paypal</label>
+                </div> {% endcomment %}
+              </div>
+
+              <hr class="mb-4">
+              <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+
+            </form>
+
+          </div>
+          <!--/.Card-->
+
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-md-4 mb-4">
+
+          <!-- Heading -->
+          <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">Your cart</span>
+            <span class="badge badge-secondary badge-pill">3</span>
+          </h4>
+
+          <!-- Cart -->
+          <ul class="list-group mb-3 z-depth-1">
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Product name</h6>
+                <small class="text-muted">Brief description</small>
+              </div>
+              <span class="text-muted">$12</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Second product</h6>
+                <small class="text-muted">Brief description</small>
+              </div>
+              <span class="text-muted">$8</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+              <div>
+                <h6 class="my-0">Third item</h6>
+                <small class="text-muted">Brief description</small>
+              </div>
+              <span class="text-muted">$5</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between bg-light">
+              <div class="text-success">
+                <h6 class="my-0">Promo code</h6>
+                <small>EXAMPLECODE</small>
+              </div>
+              <span class="text-success">-$5</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Total (USD)</span>
+              <strong>$20</strong>
+            </li>
+          </ul>
+          <!-- Cart -->
+
+          <!-- Promo code -->
+          <form class="card p-2">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Promo code" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <button class="btn btn-secondary btn-md waves-effect m-0" type="button">Redeem</button>
+              </div>
+            </div>
+          </form>
+          <!-- Promo code -->
+
+        </div>
+        <!--Grid column-->
+
+      </div>
+      <!--Grid row-->
+
+    </div>
+  </main>
+  <!--Main layout-->
+
+{% endblock content %}
