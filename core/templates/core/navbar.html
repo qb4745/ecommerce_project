@@ -4,7 +4,7 @@
 
       <!-- Brand -->
       <a class="navbar-brand waves-effect" href="/">
-        <strong class="blue-text">DJe-commerce</strong>
+        <strong class="blue-text">CompuMundoHiperMegaRed</strong>
       </a>
 
       <!-- Collapse -->
@@ -23,10 +23,12 @@
               <span class="sr-only">(current)</span>
             </a>
           </li>
+          {% if request.user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link waves-effect" href="{% url 'core:core-checkout' %}">
-            Checkout</a>
+            Revisar y Pagar</a>
           </li>
+          {% endif %}
         </ul>
 
         <!-- Right -->
@@ -41,18 +43,18 @@
           </li>
           <li class="nav-item">
             <a class="nav-link waves-effect" href="{% url 'account_logout' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Logout </span>
+              <span class="clearfix d-none d-sm-inline-block"> Cerrar Sesión </span>
             </a>
           </li>
           {% else %}
           <li class="nav-item">
             <a class="nav-link waves-effect" href="{% url 'account_login' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Login </span>
+              <span class="clearfix d-none d-sm-inline-block"> Ingresar </span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link waves-effect" href="{% url 'account_signup' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Signup </span>
+              <span class="clearfix d-none d-sm-inline-block"> Registrarse </span>
             </a>
           </li>
           {% endif %}

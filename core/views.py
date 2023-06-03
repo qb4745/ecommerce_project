@@ -11,14 +11,6 @@ from .forms import CheckoutForm
 from .models import Item, OrderItem, Order, BillingAddress
 
 # Create your views here.
-
-
-class HomeListView(ListView):
-    model = Item
-    paginate_by = 5
-    template_name = "core/home.html"
-
-
 class CheckoutView(View):
     def get(self, *args, **kwargs):
         form = CheckoutForm()
@@ -58,6 +50,21 @@ class CheckoutView(View):
         except ObjectDoesNotExist:
             messages.warning(self.request, "No tienes un pedido activo.")
             return redirect("core:core-order-summary")
+
+
+class PaymentView(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, "core/payment.html")
+
+
+class HomeListView(ListView):
+    model = Item
+    paginate_by = 5
+    template_name = "core/home.html"
+
+
+
+
 
 
 class OrderSummaryView(LoginRequiredMixin, View):
